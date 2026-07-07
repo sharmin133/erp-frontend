@@ -10,6 +10,7 @@ import DashboardPage from "../features/dashboard/DashboardPage";
 import ProductsPage from "../features/products/ProductsPage";
 import { ProtectedRoute } from "../components/common/ProtectedRoute";
 import CreateSalePage from "../features/sales/CreateSalePage";
+import UsersPage from "../features/users/UsersPage";
 
 
 
@@ -41,6 +42,8 @@ const router = createBrowserRouter([
           path: "sales/create",
           element: <CreateSalePage />,
         },
+
+        { path: "users", element: <UsersPage /> },
       ],
     },
   ],

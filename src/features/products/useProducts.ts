@@ -9,12 +9,12 @@ import {
 
 export const PRODUCTS_QUERY_KEY = "products" as const;
 
-/** Fetch product list — refetches automatically whenever `query` (search/page) changes */
+/** Fetch product list */
 export const useProducts = (query: ProductQuery) =>
   useQuery({
     queryKey: [PRODUCTS_QUERY_KEY, query],
     queryFn: () => fetchProducts(query),
-    placeholderData: (prev) => prev, // keeps old page visible while next page loads
+    placeholderData: (prev) => prev, 
   });
 
 export const useCreateProduct = () => {

@@ -1,13 +1,20 @@
 import { useState } from "react";
-import { Plus, ImageOff } from "lucide-react";
-import { DataTable, RowActions, type Column } from "../../components/common/DataTable";
-import { Button } from "../../components/common/Button";
-import type { Product } from "../../types";
+import { ImageOff, Package, Plus } from "lucide-react";
+import { toast } from "react-toastify";
+
 import { useAppSelector } from "../../app/hooks";
-import { useDeleteProduct, useProducts } from "./useProducts";
-import { SearchInput } from "../../components/common/SearchInput";
+import { confirmDelete } from "../../components/common/confirmDelete";
+import { Button } from "../../components/common/Button";
+import {
+  DataTable,
+  RowActions,
+  type Column,
+} from "../../components/common/DataTable";
 import { Pagination } from "../../components/common/Pagination";
+import { SearchInput } from "../../components/common/SearchInput";
+import type { Product } from "../../types";
 import ProductFormModal from "./ProductFormModal";
+import { useDeleteProduct, useProducts } from "./useProducts";
 
 const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:5000";
 
@@ -18,10 +25,16 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const { user } = useAppSelector((s) => s.auth);
+  const { user } = useAppSelector((state) => state.auth);
+
   const canManage = user?.role === "admin" || user?.role === "manager";
 
-  const { data, isLoading } = useProducts({ search, page, limit: 10 });
+  const { data, isLoading } = useProducts({
+    search,
+    page,
+    limit: 6,
+  });
+
   const deleteMutation = useDeleteProduct();
 
   const openCreateModal = () => {
@@ -34,10 +47,23 @@ export default function ProductsPage() {
     setModalOpen(true);
   };
 
-  const handleDelete = (product: Product) => {
-    if (!confirm(`Delete "${product.name}"? This can't be undone.`)) return;
+  const handleDelete = async (product: Product) => {
+    const confirmed = await confirmDelete(
+      `Delete "${product.name}"? This can't be undone.`,
+    );
+    if (!confirmed) return;
+
     setDeletingId(product._id);
+
     deleteMutation.mutate(product._id, {
+      onSuccess: () => {
+        toast.success("Product deleted successfully!");
+      },
+      onError: (err: any) => {
+        toast.error(
+          err?.response?.data?.message || "Failed to delete product",
+        );
+      },
       onSettled: () => setDeletingId(null),
     });
   };
@@ -45,47 +71,60 @@ export default function ProductsPage() {
   const columns: Column<Product>[] = [
     {
       header: "Image",
-      render: (p) =>
-        p.image ? (
+      render: (product) =>
+        product.image ? (
           <img
-            src={`${API_ORIGIN}${p.image}`}
-            alt={p.name}
-            className="h-10 w-10 rounded-md border border-gray-800 object-cover"
+            src={`${API_ORIGIN}${product.image}`}
+            alt={product.name}
+            className="h-10 w-10 rounded-md border border-gray-200 object-cover"
             onError={(e) => {
               e.currentTarget.style.display = "none";
             }}
           />
         ) : (
-          <div className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-800 bg-gray-800/50 text-gray-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-gray-100 text-gray-400">
             <ImageOff size={16} />
           </div>
         ),
     },
     {
       header: "Name",
-      render: (p) => <span className="font-medium text-white">{p.name}</span>,
+      render: (product) => (
+        <span className="font-medium text-gray-900">{product.name}</span>
+      ),
     },
     {
       header: "SKU",
-      render: (p) => <span className="font-mono text-xs text-gray-400">{p.sku}</span>,
+      render: (product) => (
+        <span className="font-mono text-xs text-gray-500">{product.sku}</span>
+      ),
     },
-    { header: "Category", render: (p) => p.category },
+    {
+      header: "Category",
+      render: (product) => (
+        <span className="text-gray-700">{product.category}</span>
+      ),
+    },
     {
       header: "Selling Price",
-      render: (p) => `৳${p.sellingPrice.toLocaleString()}`,
+      render: (product) => (
+        <span className="font-medium text-gray-900">
+          ৳{product.sellingPrice.toLocaleString()}
+        </span>
+      ),
     },
     {
       header: "Stock",
-      render: (p) => (
+      render: (product) => (
         <span
           className={
-            p.stockQuantity < 5
-              ? "rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-400"
-              : "text-gray-300"
+            product.stockQuantity < 5
+              ? "rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-600"
+              : "text-gray-700"
           }
         >
-          {p.stockQuantity}
-          {p.stockQuantity < 5 && " · low"}
+          {product.stockQuantity}
+          {product.stockQuantity < 5 && " · Low"}
         </span>
       ),
     },
@@ -93,11 +132,11 @@ export default function ProductsPage() {
       ? [
           {
             header: "Actions",
-            render: (p: Product) => (
+            render: (product: Product) => (
               <RowActions
-                onEdit={() => openEditModal(p)}
-                onDelete={() => handleDelete(p)}
-                isDeleting={deletingId === p._id}
+                onEdit={() => openEditModal(product)}
+                onDelete={() => handleDelete(product)}
+                isDeleting={deletingId === product._id}
               />
             ),
           } as Column<Product>,
@@ -106,41 +145,69 @@ export default function ProductsPage() {
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 rounded-xl sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">Products</h1>
+          <div className="flex items-center gap-3">
+  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md">
+    <Package size={22} />
+  </div>
+
+  <h1 className="text-2xl font-semibold text-gray-900">
+    Products
+  </h1>
+</div>
+
           {data?.meta?.total !== undefined && (
-            <p className="text-sm text-gray-500">{data.meta.total} total</p>
+            <p className="mt-1 text-sm text-gray-500">
+              {data.meta.total} total products
+            </p>
           )}
         </div>
 
         {canManage && (
-          <Button onClick={openCreateModal} className="w-full sm:w-auto">
-            <Plus size={16} className="mr-1 inline" /> Add Product
+          <Button
+            onClick={openCreateModal}
+            className="inline-flex w-full items-center justify-center gap-2 sm:w-auto"
+          >
+            <Plus size={16} />
+            <span>Add Product</span>
           </Button>
         )}
       </div>
 
+      {/* Search */}
       <SearchInput
         value={search}
-        onChange={(v) => {
-          setSearch(v);
+        onChange={(value) => {
+          setSearch(value);
           setPage(1);
         }}
-        placeholder="Search by name, SKU, category..."
+        placeholder="Search by name, SKU or category..."
       />
 
+      {/* Table */}
       <DataTable
         columns={columns}
-        data={data?.data || []}
+        data={data?.data ?? []}
         isLoading={isLoading}
-        emptyMessage={search ? `No products match "${search}"` : "No products yet"}
-        rowKey={(p) => p._id}
+        emptyMessage={
+          search
+            ? `No products found for "${search}"`
+            : "No products available."
+        }
+        rowKey={(product) => product._id}
       />
 
-      <Pagination page={page} totalPages={data?.meta?.totalPages || 1} onPageChange={setPage} />
+      {/* Pagination */}
+      <Pagination
+        page={page}
+        totalPages={data?.meta?.totalPages ?? 1}
+        onPageChange={setPage}
+      />
 
+      {/* Modal */}
       <ProductFormModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}

@@ -1,7 +1,14 @@
 import type { ReactNode, SyntheticEvent } from "react";
 import { Button } from "./Button";
 
-export type FieldType = "text" | "email" | "password" | "number" | "select" | "file" | "textarea";
+export type FieldType =
+  | "text"
+  | "email"
+  | "password"
+  | "number"
+  | "select"
+  | "file"
+  | "textarea";
 
 export interface FormField {
   name: string;
@@ -9,9 +16,9 @@ export interface FormField {
   type: FieldType;
   placeholder?: string;
   required?: boolean;
-  options?: { label: string; value: string }[]; // for type = "select"
-  accept?: string; // for type = "file", e.g. "image/*"
-  min?: number;    // for type = "number"
+  options?: { label: string; value: string }[];
+  accept?: string;
+  min?: number;
 }
 
 interface FormProps {
@@ -26,7 +33,14 @@ interface FormProps {
 }
 
 export const Form = ({
-  fields, values, onChange, onSubmit, submitLabel, isLoading, error, footer,
+  fields,
+  values,
+  onChange,
+  onSubmit,
+  submitLabel,
+  isLoading,
+  error,
+  footer,
 }: FormProps) => {
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,21 +48,21 @@ export const Form = ({
   };
 
   const baseInputClasses =
-    "w-full rounded-md border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-white placeholder-gray-500 transition-colors focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500";
+    "w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 transition-colors focus:border-emerald-700 focus:outline-none focus:ring-1 focus:ring-emerald-700";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <p className="rounded-md border border-red-800 bg-red-950 px-3 py-2 text-sm text-red-400">
+        <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
           {error}
         </p>
       )}
 
       {fields.map((field) => (
         <div key={field.name}>
-          <label className="mb-1 block text-sm font-medium text-gray-300">
+          <label className="mb-1 block text-sm font-medium text-gray-700">
             {field.label}
-            {field.required && <span className="text-sky-400"> *</span>}
+            {field.required && <span className="text-emerald-700"> *</span>}
           </label>
 
           {field.type === "select" ? (
@@ -60,7 +74,9 @@ export const Form = ({
             >
               <option value="">Select {field.label.toLowerCase()}</option>
               {field.options?.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
               ))}
             </select>
           ) : field.type === "textarea" ? (
@@ -76,8 +92,10 @@ export const Form = ({
               type="file"
               required={field.required}
               accept={field.accept}
-              onChange={(e) => onChange(field.name, e.target.files?.[0] ?? null)}
-              className="w-full text-sm text-gray-300 file:mr-3 file:rounded-md file:border-0 file:bg-sky-500 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-sky-600"
+              onChange={(e) =>
+                onChange(field.name, e.target.files?.[0] ?? null)
+              }
+              className="w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-emerald-700 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-emerald-800"
             />
           ) : (
             <input
@@ -87,7 +105,12 @@ export const Form = ({
               min={field.min}
               value={values[field.name] ?? ""}
               onChange={(e) =>
-                onChange(field.name, field.type === "number" ? Number(e.target.value) : e.target.value)
+                onChange(
+                  field.name,
+                  field.type === "number"
+                    ? Number(e.target.value)
+                    : e.target.value,
+                )
               }
               className={baseInputClasses}
             />

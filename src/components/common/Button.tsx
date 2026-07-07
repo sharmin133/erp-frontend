@@ -12,15 +12,18 @@ export const Button = ({
   const base =
     "rounded-md px-4 py-2 text-sm font-medium transition-colors duration-150 " +
     "disabled:cursor-not-allowed disabled:opacity-50 " +
-    "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900";
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white";
 
   const variants = {
     primary:
-      "bg-sky-500 text-white hover:bg-sky-600 active:bg-sky-700 focus-visible:ring-sky-500",
+      "bg-emerald-700 text-white hover:bg-emerald-800 active:bg-emerald-900 focus-visible:ring-emerald-700",
+
     secondary:
-      "border border-gray-700 bg-gray-800 text-gray-100 hover:border-gray-600 hover:bg-gray-700 active:bg-gray-600 focus-visible:ring-gray-500",
+      "bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 focus-visible:ring-gray-400",
+
     outline:
-      "border border-sky-500 text-sky-400 hover:bg-sky-500 hover:text-white active:bg-sky-600 focus-visible:ring-sky-500",
+      "border border-emerald-700 text-emerald-700 hover:bg-emerald-700 hover:text-white active:bg-emerald-800 focus-visible:ring-emerald-700",
+
     danger:
       "bg-red-500 text-white hover:bg-red-600 active:bg-red-700 focus-visible:ring-red-500",
   };

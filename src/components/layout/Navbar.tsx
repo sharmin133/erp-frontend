@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { toast } from "react-toastify";
 import { useAppSelector } from "../../app/hooks";
 import { useLogout } from "../../features/auth/useAuth";
 
@@ -14,7 +15,6 @@ export default function Navbar() {
 
   const isAuthenticated = !!user && !isCheckingAuth;
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -35,21 +35,20 @@ export default function Navbar() {
     : "U";
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-gray-800 bg-gray-900">
+    <nav className="sticky top-0 z-40 border-b border-gray-200 bg-white">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link to="/" className="text-xl font-bold">
-          <span className="text-sky-400">ERP</span>
+          <span className="text-emerald-700">ERP</span>
         </Link>
 
         <div className="flex items-center gap-3">
           {isAuthenticated && (
             <div className="relative" ref={menuRef}>
-              {/* Trigger */}
               <button
                 onClick={() => setIsOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-full border border-gray-700 bg-gray-800 px-2 py-1.5 pr-3 text-sm font-medium text-white transition hover:border-sky-400 sm:pr-4"
+                className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-2 py-1.5 pr-3 text-sm font-medium text-gray-800 transition hover:border-emerald-700 sm:pr-4"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500 text-xs font-semibold text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-xs font-semibold text-white">
                   {initials}
                 </span>
 
@@ -65,39 +64,38 @@ export default function Navbar() {
                 />
               </button>
 
-              {/* Dropdown */}
               {isOpen && (
-                <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-lg border border-gray-800 bg-gray-800 shadow-lg shadow-black/30">
-                  {/* User info */}
-                  <div className="border-b border-gray-700 px-4 py-3">
-                    <p className="truncate text-sm font-semibold text-white">
+                <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg shadow-black/5">
+                  <div className="border-b border-gray-200 px-4 py-3">
+                    <p className="truncate text-sm font-semibold text-gray-900">
                       {user.name}
                     </p>
-                    <p className="truncate text-xs text-gray-400">
+                    <p className="truncate text-xs text-gray-500">
                       {user.role}
                     </p>
                   </div>
 
-                  {/* Dashboard link */}
                   <Link
                     to="/dashboard"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-200 transition hover:bg-gray-700 hover:text-sky-400"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 transition hover:bg-emerald-50 hover:text-emerald-700"
                   >
                     <LayoutDashboard size={16} />
                     Dashboard
                   </Link>
 
-                  {/* Sign out */}
                   <button
                     onClick={() => {
                       setIsOpen(false);
                       logout(undefined, {
-                        onSuccess: () => navigate("/login"),
+                        onSuccess: () => {
+                          toast.success("Signed out successfully!");
+                          navigate("/login");
+                        },
                       });
                     }}
                     disabled={isPending}
-                    className="flex w-full items-center gap-2 rounded-b-lg px-4 py-2.5 text-left text-sm text-red-400 transition hover:bg-gray-700 disabled:opacity-50"
+                    className="flex w-full items-center gap-2 rounded-b-lg px-4 py-2.5 text-left text-sm text-red-500 transition hover:bg-red-50 disabled:opacity-50"
                   >
                     <LogOut size={16} />
                     {isPending ? "Signing out..." : "Sign out"}
@@ -111,14 +109,14 @@ export default function Navbar() {
             <>
               <Link
                 to="/login"
-                className="rounded-md border border-sky-400 px-4 py-2 text-sm font-medium text-sky-400 transition hover:bg-sky-400 hover:text-white"
+                className="rounded-md border border-emerald-700 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-700 hover:text-white"
               >
                 Login
               </Link>
 
               <Link
                 to="/register"
-                className="rounded-md bg-sky-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-600"
+                className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-800"
               >
                 Signup
               </Link>
