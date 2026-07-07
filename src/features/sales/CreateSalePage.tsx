@@ -107,7 +107,7 @@ export default function CreateSalePage() {
             </span>
           </div>
 
-          <div className="max-h-150 space-y-3 overflow-y-auto pr-2">
+          <div className="max-h-135 space-y-3 overflow-y-auto pr-2">
             {lines.map((line, idx) => {
               const product = getProduct(line.product);
               const overStock =
