@@ -19,7 +19,6 @@ const roleStyles: Record<UserRole, string> = {
   manager: "bg-emerald-50 text-emerald-700",
   employee: "bg-gray-100 text-gray-600",
 };
-
 export default function UsersPage() {
   const { data: users, isLoading } = useUsers();
   const updateRole = useUpdateUserRole();

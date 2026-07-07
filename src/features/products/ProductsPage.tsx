@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useAppSelector } from "../../app/hooks";
 import { confirmDelete } from "../../components/common/confirmDelete";
 import { Button } from "../../components/common/Button";
+import { CustomSelect } from "../../components/common/CustomSelect";
 import {
   DataTable,
   RowActions,
@@ -46,7 +47,7 @@ export default function ProductsPage() {
     limit: 6,
   });
 
-
+  // Lightweight full list just to build the category dropdown options
   const { data: allProductsData } = useProducts({ limit: 100 });
   const categoryOptions = Array.from(
     new Set((allProductsData?.data ?? []).map((p) => p.category))
@@ -167,7 +168,7 @@ export default function ProductsPage() {
       <div className="flex flex-col gap-4 rounded-xl sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-green-600 text-white shadow-md">
               <Package size={22} />
             </div>
             <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
@@ -204,33 +205,27 @@ export default function ProductsPage() {
           />
         </div>
 
-        <select
+        <CustomSelect
           value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
+          onChange={(value) => {
+            setCategory(value);
             setPage(1);
           }}
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
-        >
-          <option value="">All Categories</option>
-          {categoryOptions.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+          options={[
+            { label: "All Categories", value: "" },
+            ...categoryOptions.map((cat) => ({ label: cat, value: cat })),
+          ]}
+          placeholder="All Categories"
+          className="sm:w-48"
+        />
 
-        <select
+        <CustomSelect
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
-          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
-        >
-          {SORT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          onChange={setSort}
+          options={SORT_OPTIONS}
+          placeholder="Sort by"
+          className="sm:w-56"
+        />
       </div>
 
       {/* Table */}
