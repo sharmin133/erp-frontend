@@ -3,6 +3,8 @@ import type { ApiResponse, Product } from "../../types";
 
 export interface ProductQuery {
   search?: string;
+  category?: string;
+  sort?: string;
   page?: number;
   limit?: number;
 }

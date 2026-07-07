@@ -3,7 +3,7 @@ import { store } from "../app/store";
 import { clearUser } from "../features/auth/authSlice";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_URL ,
   withCredentials: true,
 });
 

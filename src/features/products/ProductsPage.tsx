@@ -16,22 +16,41 @@ import type { Product } from "../../types";
 import ProductFormModal from "./ProductFormModal";
 import { useDeleteProduct, useProducts } from "./useProducts";
 
+const SORT_OPTIONS = [
+  { label: "Newest First", value: "-createdAt" },
+  { label: "Name (A-Z)", value: "name" },
+  { label: "Name (Z-A)", value: "-name" },
+  { label: "Price (Low to High)", value: "sellingPrice" },
+  { label: "Price (High to Low)", value: "-sellingPrice" },
+  { label: "Stock (Low to High)", value: "stockQuantity" },
+  { label: "Stock (High to Low)", value: "-stockQuantity" },
+];
+
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("");
+  const [sort, setSort] = useState("-createdAt");
   const [page, setPage] = useState(1);
   const [isModalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { user } = useAppSelector((state) => state.auth);
-
   const canManage = user?.role === "admin" || user?.role === "manager";
 
   const { data, isLoading } = useProducts({
     search,
+    category: category || undefined,
+    sort,
     page,
     limit: 6,
   });
+
+
+  const { data: allProductsData } = useProducts({ limit: 100 });
+  const categoryOptions = Array.from(
+    new Set((allProductsData?.data ?? []).map((p) => p.category))
+  ).sort();
 
   const deleteMutation = useDeleteProduct();
 
@@ -66,15 +85,13 @@ export default function ProductsPage() {
     });
   };
 
-
-
   const columns: Column<Product>[] = [
     {
       header: "Image",
       render: (product) =>
         product.image ? (
           <img
-            src={product.image} 
+            src={product.image}
             alt={product.name}
             className="h-10 w-10 rounded-md border border-gray-200 object-cover"
             onError={(e) => {
@@ -99,7 +116,6 @@ export default function ProductsPage() {
         <span className="font-mono text-xs text-gray-500">{product.sku}</span>
       ),
     },
-    
     {
       header: "Category",
       render: (product) => (
@@ -154,10 +170,7 @@ export default function ProductsPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md">
               <Package size={22} />
             </div>
-
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Products
-            </h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
           </div>
 
           {data?.meta?.total !== undefined && (
@@ -178,15 +191,47 @@ export default function ProductsPage() {
         )}
       </div>
 
-      {/* Search */}
-      <SearchInput
-        value={search}
-        onChange={(value) => {
-          setSearch(value);
-          setPage(1);
-        }}
-        placeholder="Search by name, SKU or category..."
-      />
+      {/* Search + Filter + Sort */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="sm:flex-1">
+          <SearchInput
+            value={search}
+            onChange={(value) => {
+              setSearch(value);
+              setPage(1);
+            }}
+            placeholder="Search by name, SKU or category..."
+          />
+        </div>
+
+        <select
+          value={category}
+          onChange={(e) => {
+            setCategory(e.target.value);
+            setPage(1);
+          }}
+          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
+        >
+          <option value="">All Categories</option>
+          {categoryOptions.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 focus:border-emerald-500 focus:outline-none"
+        >
+          {SORT_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Table */}
       <DataTable
