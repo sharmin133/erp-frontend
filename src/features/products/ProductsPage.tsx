@@ -16,8 +16,6 @@ import type { Product } from "../../types";
 import ProductFormModal from "./ProductFormModal";
 import { useDeleteProduct, useProducts } from "./useProducts";
 
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ;
-
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
@@ -74,7 +72,7 @@ export default function ProductsPage() {
       render: (product) =>
         product.image ? (
           <img
-            src={`${API_ORIGIN}${product.image}`}
+            src={product.image} // Cloudinary already returns a full HTTPS URL
             alt={product.name}
             className="h-10 w-10 rounded-md border border-gray-200 object-cover"
             onError={(e) => {
@@ -150,14 +148,14 @@ export default function ProductsPage() {
       <div className="flex flex-col gap-4 rounded-xl sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
-  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md">
-    <Package size={22} />
-  </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white shadow-md">
+              <Package size={22} />
+            </div>
 
-  <h1 className="text-2xl font-semibold text-gray-900">
-    Products
-  </h1>
-</div>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Products
+            </h1>
+          </div>
 
           {data?.meta?.total !== undefined && (
             <p className="mt-1 text-sm text-gray-500">
