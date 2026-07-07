@@ -66,13 +66,15 @@ export default function ProductsPage() {
     });
   };
 
+
+
   const columns: Column<Product>[] = [
     {
       header: "Image",
       render: (product) =>
         product.image ? (
           <img
-            src={product.image} // Cloudinary already returns a full HTTPS URL
+            src={product.image} 
             alt={product.name}
             className="h-10 w-10 rounded-md border border-gray-200 object-cover"
             onError={(e) => {
@@ -97,6 +99,7 @@ export default function ProductsPage() {
         <span className="font-mono text-xs text-gray-500">{product.sku}</span>
       ),
     },
+    
     {
       header: "Category",
       render: (product) => (
