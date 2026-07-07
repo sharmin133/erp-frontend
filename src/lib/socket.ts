@@ -1,7 +1,7 @@
 import { io, type Socket } from "socket.io-client";
 
 
-export const socket: Socket = io(import.meta.env.VITE_API_ORIGIN || "http://localhost:5000", {
+export const socket: Socket = io(import.meta.env.VITE_API_ORIGIN, {
   withCredentials: true,
   autoConnect: false,
 });

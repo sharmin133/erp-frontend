@@ -16,7 +16,7 @@ import type { Product } from "../../types";
 import ProductFormModal from "./ProductFormModal";
 import { useDeleteProduct, useProducts } from "./useProducts";
 
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "http://localhost:5000";
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN ;
 
 export default function ProductsPage() {
   const [search, setSearch] = useState("");
